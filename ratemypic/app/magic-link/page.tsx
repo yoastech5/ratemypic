@@ -26,13 +26,10 @@ export default async function MagicLinkPage({
 
     const supabase = await createClient()
     
-    // Get the origin from headers
-    const origin = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001'
-    
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${origin}/auth/callback`,
+        emailRedirectTo: 'https://ratemypic-psi.vercel.app/auth/callback',
       },
     })
 
