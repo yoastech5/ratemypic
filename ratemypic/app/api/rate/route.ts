@@ -45,6 +45,27 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Failed to submit rating' }, { status: 500 })
     }
 
+    // Manually update photo stats (in case trigger doesn't work)
+    const { data: stats } = await supabase
+      .from('ratings')
+      .select('rating_value')
+      .eq('photo_id', photo_id)
+
+    if (stats && stats.length > 0) {
+      const total = stats.length
+      const sum = stats.reduce((acc, r) => acc + r.rating_value, 0)
+      const avg = sum / total
+
+      await supabase
+        .from('photos')
+        .update({
+          total_ratings: total,
+          rating_sum: sum,
+          rating_average: avg,
+        })
+        .eq('id', photo_id)
+    }
+
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Rating error:', error)
