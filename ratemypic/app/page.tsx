@@ -156,8 +156,8 @@ export default async function Home() {
               <p className="text-sm sm:text-base text-gray-600">{photos.length} {photos.length === 1 ? 'photo' : 'photos'}</p>
             </div>
             
-            {/* Masonry Grid Layout */}
-            <div className="columns-1 sm:columns-2 lg:columns-3 gap-3 sm:gap-4 space-y-3 sm:space-y-4">
+            {/* Grid Layout */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
               {photos.map((photo) => (
                 <PhotoCard
                   key={photo.id}
