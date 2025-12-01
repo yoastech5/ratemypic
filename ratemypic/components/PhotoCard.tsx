@@ -108,13 +108,36 @@ export default function PhotoCard({ photo, userRating, isLoggedIn }: {
         {/* Rating Section */}
         {isLoggedIn ? (
           selectedRating !== null ? (
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg sm:rounded-xl p-3 sm:p-4 text-center">
-              <p className="text-green-700 font-bold flex items-center justify-center gap-2 text-sm sm:text-base">
-                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                You rated this {selectedRating}/10
-              </p>
+            <div>
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg sm:rounded-xl p-3 sm:p-4 text-center mb-3">
+                <p className="text-green-700 font-bold flex items-center justify-center gap-2 text-sm sm:text-base">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  You rated this {selectedRating}/10
+                </p>
+              </div>
+              <button
+                onClick={async () => {
+                  if (confirm('Remove your rating?')) {
+                    try {
+                      const response = await fetch('/api/rate/delete', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ photo_id: photo.id }),
+                      })
+                      if (response.ok) {
+                        window.location.reload()
+                      }
+                    } catch (error) {
+                      console.error('Failed to delete rating:', error)
+                    }
+                  }
+                }}
+                className="w-full bg-gray-100 text-gray-700 py-2 sm:py-2.5 rounded-lg sm:rounded-xl font-semibold hover:bg-gray-200 transition-all text-sm sm:text-base border border-gray-200"
+              >
+                Change Rating
+              </button>
             </div>
           ) : showRatingButtons ? (
             <div>
