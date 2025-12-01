@@ -72,13 +72,13 @@ export default function PhotoCard({ photo, userRating, isLoggedIn }: {
 
   return (
     <div className="break-inside-avoid bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden hover:shadow-2xl transition-all duration-300 border border-gray-100">
-      <div className="relative w-full group">
+      <div className="relative w-full h-48 sm:h-56 md:h-64 group overflow-hidden">
         <Image
           src={photo.photo_url}
           alt={photo.title}
-          width={500}
-          height={500}
-          className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105"
+          fill
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
       </div>
