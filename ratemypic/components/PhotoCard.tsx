@@ -54,14 +54,14 @@ export default function PhotoCard({ photo, userRating, isLoggedIn }: {
         setSelectedRating(rating)
         setShowRatingButtons(false)
         
-        // Update local stats optimistically
+        // Update local stats immediately
         const newTotal = localTotalRatings + 1
         const newAvg = ((localRatingAvg * localTotalRatings) + rating) / newTotal
         setLocalRatingAvg(newAvg)
         setLocalTotalRatings(newTotal)
         
-        // Refresh to get accurate data
-        setTimeout(() => router.refresh(), 1000)
+        // Force page refresh to get server data
+        window.location.reload()
       }
     } catch (error) {
       console.error('Failed to rate:', error)
