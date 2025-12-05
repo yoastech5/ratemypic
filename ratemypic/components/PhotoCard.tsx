@@ -72,7 +72,7 @@ export default function PhotoCard({ photo, userRating, isLoggedIn }: {
 
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100">
-      <div className="relative w-full h-96 sm:h-[28rem] md:h-96 group overflow-hidden bg-gray-100">
+      <div className="relative w-full h-[26rem] sm:h-[32rem] md:h-[28rem] group overflow-hidden bg-gray-100">
         <Image
           src={photo.photo_url}
           alt={photo.title}
