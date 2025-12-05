@@ -85,15 +85,18 @@ export default function PhotoCard({ photo, userRating, isLoggedIn }: {
       <div className="p-3">
         <h3 className="font-bold text-sm mb-1 text-gray-900 line-clamp-1">{photo.title}</h3>
         
-        <div className="flex items-center gap-2 mb-2 pb-2 border-b border-gray-100">
-          <span className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            {localRatingAvg > 0 ? localRatingAvg.toFixed(1) : 'N/A'}
-          </span>
-          <span className="text-gray-400 text-xs">/10</span>
-          <span className="text-gray-500 text-xs">
-            ({localTotalRatings})
-          </span>
-        </div>
+        {/* Show rating only if logged in */}
+        {isLoggedIn && (
+          <div className="flex items-center gap-2 mb-2 pb-2 border-b border-gray-100">
+            <span className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              {localRatingAvg > 0 ? localRatingAvg.toFixed(1) : 'N/A'}
+            </span>
+            <span className="text-gray-400 text-xs">/10</span>
+            <span className="text-gray-500 text-xs">
+              ({localTotalRatings})
+            </span>
+          </div>
+        )}
 
         {/* Rating Section */}
         {isLoggedIn ? (
