@@ -159,7 +159,7 @@ export default async function Home() {
       <AdSense />
 
       {/* Photo Gallery with Sidebar */}
-      <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-16 pb-20 md:pb-16">
+      <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-16 pb-20 md:pb-16">
         {!photos || photos.length === 0 ? (
           <div className="text-center py-20 sm:py-32">
             <div className="text-5xl sm:text-6xl mb-4 sm:mb-6">📷</div>
