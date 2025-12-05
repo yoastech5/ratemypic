@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import PhotoCard from '@/components/PhotoCard'
 import AdSense from '@/components/AdSense'
+import AdSenseSidebar from '@/components/AdSenseSidebar'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -145,8 +146,8 @@ export default async function Home() {
       {/* AdSense Ad */}
       <AdSense />
 
-      {/* Photo Gallery */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-16 pb-20 md:pb-16">
+      {/* Photo Gallery with Sidebar */}
+      <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-16 pb-20 md:pb-16">
         {!photos || photos.length === 0 ? (
           <div className="text-center py-20 sm:py-32">
             <div className="text-5xl sm:text-6xl mb-4 sm:mb-6">📷</div>
@@ -154,24 +155,34 @@ export default async function Home() {
             <p className="text-base sm:text-lg text-gray-600">Check back soon for amazing content!</p>
           </div>
         ) : (
-          <>
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-10 gap-2">
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">Latest Photos</h2>
-              <p className="text-sm sm:text-base text-gray-600">{photos.length} {photos.length === 1 ? 'photo' : 'photos'}</p>
+          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+            {/* Main Content */}
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-10 gap-2">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">Latest Photos</h2>
+                <p className="text-sm sm:text-base text-gray-600">{photos.length} {photos.length === 1 ? 'photo' : 'photos'}</p>
+              </div>
+              
+              {/* Grid Layout */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+                {photos.map((photo) => (
+                  <PhotoCard
+                    key={photo.id}
+                    photo={photo}
+                    userRating={userRatings[photo.id] || null}
+                    isLoggedIn={!!user}
+                  />
+                ))}
+              </div>
             </div>
-            
-            {/* Grid Layout */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-              {photos.map((photo) => (
-                <PhotoCard
-                  key={photo.id}
-                  photo={photo}
-                  userRating={userRatings[photo.id] || null}
-                  isLoggedIn={!!user}
-                />
-              ))}
-            </div>
-          </>
+
+            {/* Sidebar - Responsive */}
+            <aside className="w-full lg:w-80 flex-shrink-0 lg:block">
+              <div className="lg:sticky lg:top-20">
+                <AdSenseSidebar />
+              </div>
+            </aside>
+          </div>
         )}
       </main>
 
