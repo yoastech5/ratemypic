@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import PhotoCard from '@/components/PhotoCard'
+import AdSense from '@/components/AdSense'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -140,6 +141,9 @@ export default async function Home() {
           )}
         </div>
       </div>
+
+      {/* AdSense Ad */}
+      <AdSense />
 
       {/* Photo Gallery */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-16 pb-20 md:pb-16">
