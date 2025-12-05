@@ -33,6 +33,7 @@ export default function OTPLoginPage() {
         email: email,
         options: {
           shouldCreateUser: true, // Create user if doesn't exist
+          emailRedirectTo: undefined, // Don't send magic link, send OTP code only
         },
       })
 
@@ -40,7 +41,7 @@ export default function OTPLoginPage() {
 
       // Success - code sent
       setCodeSent(true)
-      setMessage('✓ Check your email! We sent you a 6-digit code.')
+      setMessage('✓ Check your email! We sent you a login code. You can click the link or copy the token.')
     } catch (error: any) {
       setError(error.message || 'Failed to send code. Please try again.')
     } finally {
@@ -161,28 +162,40 @@ export default function OTPLoginPage() {
               />
             </div>
 
+            {/* Instructions */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm">
+              <p className="text-blue-800 font-medium mb-2">📧 Check your email:</p>
+              <ul className="text-blue-700 space-y-1 list-disc list-inside">
+                <li>Look for a 6-digit code in the email</li>
+                <li>Or copy the token from the magic link URL</li>
+                <li>Paste it below to login</li>
+              </ul>
+            </div>
+
             <div>
               <label htmlFor="otp" className="block text-sm font-medium text-gray-700 mb-2">
-                6-Digit Code
+                Login Code / Token
               </label>
               <input
                 id="otp"
                 type="text"
                 value={otp}
-                onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                placeholder="123456"
-                maxLength={6}
+                onChange={(e) => setOtp(e.target.value.trim())}
+                placeholder="Enter code or token"
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition text-center text-2xl tracking-widest font-mono"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition text-center font-mono"
               />
+              <p className="text-xs text-gray-500 mt-1">
+                Accepts 6-digit codes or full tokens
+              </p>
             </div>
 
             <button
               type="submit"
-              disabled={loading || otp.length !== 6}
+              disabled={loading || otp.length < 6}
               className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Verifying...' : 'Verify Code'}
+              {loading ? 'Verifying...' : 'Verify & Login'}
             </button>
 
             {/* Resend Code Button */}
