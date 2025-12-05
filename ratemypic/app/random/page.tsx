@@ -1,19 +1,54 @@
-import { createClient } from '@/lib/supabase/server'
+'use client'
+
+import { useState, useEffect } from 'react'
+import { createBrowserClient } from '@supabase/ssr'
 import Image from 'next/image'
 import Link from 'next/link'
 import BackButton from '@/components/BackButton'
 
-export default async function RandomPage() {
-  const supabase = await createClient()
+export default function RandomPage() {
+  const [photos, setPhotos] = useState<any[]>([])
+  const [randomPhoto, setRandomPhoto] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
 
-  const { data: photos } = await supabase
-    .from('photos')
-    .select('*')
-    .eq('status', 'public')
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
 
-  const randomPhoto = photos && photos.length > 0 
-    ? photos[Math.floor(Math.random() * photos.length)]
-    : null
+  const loadPhotos = async () => {
+    const { data } = await supabase
+      .from('photos')
+      .select('*')
+      .eq('status', 'public')
+    
+    if (data && data.length > 0) {
+      setPhotos(data)
+      setRandomPhoto(data[Math.floor(Math.random() * data.length)])
+    }
+    setLoading(false)
+  }
+
+  const showAnotherRandom = () => {
+    if (photos.length > 0) {
+      setRandomPhoto(photos[Math.floor(Math.random() * photos.length)])
+    }
+  }
+
+  useEffect(() => {
+    loadPhotos()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-4xl mb-4">🎲</div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -59,12 +94,12 @@ export default async function RandomPage() {
                 </span>
               </div>
               <div className="mt-6">
-                <Link
-                  href="/random"
+                <button
+                  onClick={showAnotherRandom}
                   className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
                 >
-                  Show Another Random Photo
-                </Link>
+                  🎲 Show Another Random Photo
+                </button>
               </div>
             </div>
           </div>
