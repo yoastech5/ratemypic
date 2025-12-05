@@ -86,6 +86,9 @@ export default async function LoginPage() {
           </div>
 
           <div className="text-center space-y-3">
+            <Link href="/otp-login" className="block text-purple-600 hover:text-purple-500 font-medium">
+              🔐 Sign in with Email Code (OTP)
+            </Link>
             <Link href="/magic-link" className="block text-blue-600 hover:text-blue-500 font-medium">
               ✨ Sign in with Magic Link (no password)
             </Link>

@@ -67,6 +67,9 @@ export default async function Home() {
                 </form>
               ) : (
                 <>
+                  <Link href="/otp-login" className="text-purple-600 hover:text-purple-700 font-medium transition">
+                    OTP Login
+                  </Link>
                   <Link href="/login" className="text-gray-600 hover:text-gray-900 font-medium transition">
                     Login
                   </Link>
