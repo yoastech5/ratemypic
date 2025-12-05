@@ -28,7 +28,7 @@ export default function PhotoCard({ photo, userRating, isLoggedIn }: {
 
   const handleRate = async (rating: number) => {
     if (!isLoggedIn) {
-      router.push('/login')
+      router.push('/otp-login')
       return
     }
 
@@ -160,10 +160,11 @@ export default function PhotoCard({ photo, userRating, isLoggedIn }: {
           )
         ) : (
           <button
-            onClick={() => router.push('/login')}
-            className="w-full bg-gray-100 text-gray-700 py-2 rounded-lg font-semibold hover:bg-gray-200 transition-all text-xs"
+            onClick={() => router.push('/otp-login')}
+            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-2 rounded-lg font-bold hover:shadow-lg transition-all text-xs flex items-center justify-center gap-1"
           >
-            Login
+            <span>🔐</span>
+            <span>Login</span>
           </button>
         )}
       </div>
