@@ -70,17 +70,10 @@ export default async function Home() {
                   </button>
                 </form>
               ) : (
-                <>
-                  <Link href="/otp-login" className="text-purple-600 hover:text-purple-700 font-medium transition">
-                    OTP Login
-                  </Link>
-                  <Link href="/login" className="text-gray-600 hover:text-gray-900 font-medium transition">
-                    Login
-                  </Link>
-                  <Link href="/signup" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 lg:px-6 py-2 lg:py-2.5 rounded-full font-semibold hover:shadow-lg hover:scale-105 transition-all text-sm lg:text-base">
-                    Sign Up
-                  </Link>
-                </>
+                <Link href="/otp-login" className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 lg:px-6 py-2 lg:py-2.5 rounded-full font-semibold hover:shadow-lg hover:scale-105 transition-all text-sm lg:text-base flex items-center gap-2">
+                  <span>🔐</span>
+                  <span>Login</span>
+                </Link>
               )}
             </div>
 
@@ -93,14 +86,10 @@ export default async function Home() {
                   </button>
                 </form>
               ) : (
-                <>
-                  <Link href="/login" className="text-gray-600 hover:text-gray-900 font-medium transition text-sm">
-                    Login
-                  </Link>
-                  <Link href="/signup" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-full font-semibold text-sm">
-                    Sign Up
-                  </Link>
-                </>
+                <Link href="/otp-login" className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 rounded-full font-semibold text-sm flex items-center gap-1">
+                  <span>🔐</span>
+                  <span>Login</span>
+                </Link>
               )}
             </div>
           </div>
@@ -142,11 +131,12 @@ export default async function Home() {
           </p>
           {!user && (
             <Link
-              href="/signup"
+              href="/otp-login"
               className="inline-flex items-center gap-2 bg-white text-gray-900 px-6 sm:px-8 py-3 sm:py-4 rounded-full font-bold text-base sm:text-lg hover:bg-gray-100 hover:scale-105 transition-all shadow-2xl"
             >
-              <span className="hidden sm:inline">Join Now - It's Free</span>
-              <span className="sm:hidden">Join Free</span>
+              <span className="text-xl">🔐</span>
+              <span className="hidden sm:inline">Login to Start Rating</span>
+              <span className="sm:hidden">Login</span>
               <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
@@ -208,10 +198,11 @@ export default async function Home() {
               Join our community and start rating amazing photos today
             </p>
             <Link
-              href="/signup"
+              href="/otp-login"
               className="inline-flex items-center gap-2 bg-white text-gray-900 px-6 sm:px-8 py-3 sm:py-4 rounded-full font-bold text-base sm:text-lg hover:bg-gray-100 hover:scale-105 transition-all shadow-2xl"
             >
-              Sign Up Now
+              <span className="text-xl">🔐</span>
+              <span>Login Now</span>
               <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>

@@ -37,12 +37,12 @@ export default async function TrendingPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {photos.map((photo) => (
               <div key={photo.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-                <div className="relative w-full h-64">
+                <div className="relative w-full h-64 sm:h-72 bg-gray-100">
                   <Image
                     src={photo.photo_url}
                     alt={photo.title}
                     fill
-                    className="object-cover"
+                    className="object-contain"
                   />
                 </div>
                 <div className="p-4">

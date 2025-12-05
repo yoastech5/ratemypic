@@ -5,7 +5,7 @@ import { createBrowserClient } from '@supabase/ssr'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
-export default function OTPLoginPage() {
+export default function OTPLoginV2Page() {
   const router = useRouter()
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -14,7 +14,7 @@ export default function OTPLoginPage() {
 
   // State variables
   const [email, setEmail] = useState('') // User's email address
-  const [otp, setOtp] = useState('') // 6-digit code entered by user
+  const [otp, setOtp] = useState('') // Token entered by user
   const [loading, setLoading] = useState(false) // Loading state for buttons
   const [codeSent, setCodeSent] = useState(false) // Track if code was sent
   const [message, setMessage] = useState('') // Success messages
@@ -33,7 +33,6 @@ export default function OTPLoginPage() {
         email: email,
         options: {
           shouldCreateUser: true, // Create user if doesn't exist
-          emailRedirectTo: undefined, // Don't send magic link, send OTP code only
         },
       })
 
@@ -41,7 +40,9 @@ export default function OTPLoginPage() {
 
       // Success - code sent
       setCodeSent(true)
-      setMessage('✓ Check your email! We sent you a login code. You can click the link or copy the token.')
+      setMessage(
+        '✓ Check your email! We sent you a login code. You can either click the link or copy the token from the URL.'
+      )
     } catch (error: any) {
       setError(error.message || 'Failed to send code. Please try again.')
     } finally {
@@ -69,15 +70,18 @@ export default function OTPLoginPage() {
       if (data.user) {
         // Success - user is logged in
         setMessage('✓ Login successful! Redirecting...')
-        
-        // Redirect to home page after 1 second
+
+        // Redirect to dashboard after 1 second
         setTimeout(() => {
-          router.push('/')
+          router.push('/rate')
           router.refresh()
         }, 1000)
       }
     } catch (error: any) {
-      setError(error.message || 'Invalid or expired code. Please try again.')
+      setError(
+        error.message ||
+          'Invalid or expired code. Please try again or request a new code.'
+      )
     } finally {
       setLoading(false)
     }
@@ -98,8 +102,8 @@ export default function OTPLoginPage() {
             {codeSent ? 'Enter Code' : 'Login with Email'}
           </h1>
           <p className="text-gray-600">
-            {codeSent 
-              ? 'We sent a 6-digit code to your email' 
+            {codeSent
+              ? 'Check your email for the login code'
               : 'Get a secure login code sent to your email'}
           </p>
         </div>
@@ -122,7 +126,10 @@ export default function OTPLoginPage() {
         {!codeSent && (
           <form onSubmit={handleSendCode} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Email Address
               </label>
               <input
@@ -150,7 +157,10 @@ export default function OTPLoginPage() {
         {codeSent && (
           <form onSubmit={handleVerifyCode} className="space-y-6">
             <div>
-              <label htmlFor="email-display" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="email-display"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Email
               </label>
               <input
@@ -163,30 +173,44 @@ export default function OTPLoginPage() {
             </div>
 
             {/* Instructions */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm">
-              <p className="text-blue-800 font-medium mb-2">📧 Check your email:</p>
-              <ul className="text-blue-700 space-y-1 list-disc list-inside">
-                <li>Look for a 6-digit code in the email</li>
-                <li>Or copy the token from the magic link URL</li>
-                <li>Paste it below to login</li>
-              </ul>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <p className="text-sm text-blue-800 font-medium mb-2">
+                📧 How to get your code:
+              </p>
+              <ol className="text-sm text-blue-700 space-y-1 list-decimal list-inside">
+                <li>Check your email inbox</li>
+                <li>
+                  <strong>Option 1:</strong> Click the link to auto-login
+                </li>
+                <li>
+                  <strong>Option 2:</strong> Copy the token from the email link
+                  URL
+                </li>
+                <li>Paste the token below</li>
+              </ol>
+              <p className="text-xs text-blue-600 mt-2">
+                The token looks like: abc123def456 or 123456
+              </p>
             </div>
 
             <div>
-              <label htmlFor="otp" className="block text-sm font-medium text-gray-700 mb-2">
-                Login Code / Token
+              <label
+                htmlFor="otp"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Login Token / Code
               </label>
               <input
                 id="otp"
                 type="text"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.trim())}
-                placeholder="Enter code or token"
+                placeholder="Enter token or code"
                 required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition text-center font-mono"
               />
               <p className="text-xs text-gray-500 mt-1">
-                Accepts 6-digit codes or full tokens
+                Paste the full token from your email
               </p>
             </div>
 
@@ -225,14 +249,25 @@ export default function OTPLoginPage() {
         )}
 
         {/* Footer Links */}
-        <div className="mt-8 text-center">
-          <Link
-            href="/"
-            className="text-sm text-gray-600 hover:text-gray-800 font-medium inline-flex items-center gap-1"
-          >
-            <span>←</span>
-            <span>Back to Home</span>
-          </Link>
+        <div className="mt-8 text-center space-y-2">
+          <p className="text-sm text-gray-600">
+            Don't have an account?{' '}
+            <Link
+              href="/signup"
+              className="text-purple-600 hover:text-purple-700 font-medium"
+            >
+              Sign up
+            </Link>
+          </p>
+          <p className="text-sm text-gray-600">
+            Or{' '}
+            <Link
+              href="/login"
+              className="text-purple-600 hover:text-purple-700 font-medium"
+            >
+              login with password
+            </Link>
+          </p>
         </div>
       </div>
     </div>
