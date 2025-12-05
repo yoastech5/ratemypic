@@ -50,8 +50,12 @@ export default async function Home() {
             
             {/* Desktop Navigation */}
             <div className="hidden md:flex gap-6 lg:gap-8 items-center">
-              <Link href="/top" className="text-gray-600 hover:text-gray-900 font-medium transition flex items-center gap-1">
-                <span>🏆</span> <span className="hidden lg:inline">Top</span>
+              <Link href="/top" className="relative text-gray-600 hover:text-gray-900 font-medium transition flex items-center gap-1 group">
+                <span>🏆</span> 
+                <span className="hidden lg:inline">Top</span>
+                <span className="ml-1 px-2 py-0.5 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold rounded-full shadow-sm group-hover:shadow-md transition-all">
+                  PRO
+                </span>
               </Link>
               <Link href="/trending" className="text-gray-600 hover:text-gray-900 font-medium transition flex items-center gap-1">
                 <span>🔥</span> <span className="hidden lg:inline">Trending</span>
@@ -105,8 +109,13 @@ export default async function Home() {
         {/* Mobile Bottom Nav */}
         <div className="md:hidden border-t border-gray-200 bg-white">
           <div className="flex justify-around py-2">
-            <Link href="/top" className="flex flex-col items-center gap-1 text-gray-600 hover:text-gray-900 transition py-2 px-4">
-              <span className="text-xl">🏆</span>
+            <Link href="/top" className="relative flex flex-col items-center gap-1 text-gray-600 hover:text-gray-900 transition py-2 px-4">
+              <div className="relative">
+                <span className="text-xl">🏆</span>
+                <span className="absolute -top-1 -right-2 px-1.5 py-0.5 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-[8px] font-bold rounded-full">
+                  PRO
+                </span>
+              </div>
               <span className="text-xs font-medium">Top</span>
             </Link>
             <Link href="/trending" className="flex flex-col items-center gap-1 text-gray-600 hover:text-gray-900 transition py-2 px-4">
@@ -166,8 +175,8 @@ export default async function Home() {
                 <p className="text-sm sm:text-base text-gray-600">{photos.length} {photos.length === 1 ? 'photo' : 'photos'}</p>
               </div>
               
-              {/* Grid Layout */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+              {/* Grid Layout - Medium Bigger Images */}
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
                 {photos.map((photo) => (
                   <PhotoCard
                     key={photo.id}
