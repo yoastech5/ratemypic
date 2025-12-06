@@ -7,6 +7,8 @@ export default function UploadForm() {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [uploadMethod, setUploadMethod] = useState<'file' | 'url'>('file')
+  const [imageUrl, setImageUrl] = useState('')
   const router = useRouter()
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -22,13 +24,34 @@ export default function UploadForm() {
     setUploading(true)
     setError(null)
 
-    const formData = new FormData(e.currentTarget)
-
     try {
-      const response = await fetch('/api/admin/upload', {
-        method: 'POST',
-        body: formData,
-      })
+      let response
+      
+      if (uploadMethod === 'url') {
+        // Submit as JSON for URL method
+        const formData = new FormData(e.currentTarget)
+        const data = {
+          photo_url: imageUrl,
+          title: formData.get('title'),
+          description: formData.get('description'),
+          category: formData.get('category'),
+        }
+
+        response = await fetch('/api/admin/upload-url', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        })
+      } else {
+        // Submit as FormData for file upload
+        const formData = new FormData(e.currentTarget)
+        response = await fetch('/api/admin/upload', {
+          method: 'POST',
+          body: formData,
+        })
+      }
 
       const data = await response.json()
 
@@ -37,6 +60,10 @@ export default function UploadForm() {
         setUploading(false)
         return
       }
+
+      // Show success message
+      const storageType = data.storage === 'imagekit' ? '✅ ImageKit' : data.storage === 'url' ? '🔗 URL' : '📦 Supabase'
+      alert(`Photo added successfully!\nStorage: ${storageType}\nURL: ${data.imageUrl}`)
 
       router.push('/admin/photos')
     } catch (err) {
@@ -61,26 +88,95 @@ export default function UploadForm() {
         </div>
       )}
 
-      <div className="mb-4">
-        <label htmlFor="photo" className="block text-sm font-medium text-gray-700 mb-2">
-          Photo File
+      {/* Upload Method Toggle */}
+      <div className="mb-6">
+        <label className="block text-sm font-medium text-gray-700 mb-3">
+          Upload Method
         </label>
-        <input
-          type="file"
-          id="photo"
-          name="photo"
-          accept="image/*"
-          required
-          onChange={handleFileChange}
-          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-        />
-        {selectedFile && (
-          <div className="mt-2 text-xs text-gray-600 bg-blue-50 border border-blue-200 rounded-lg p-3">
-            <p className="font-medium mb-1">📁 {selectedFile.name}</p>
-            <p>Size: {formatFileSize(selectedFile.size)}</p>
-          </div>
-        )}
+        <div className="flex gap-4">
+          <button
+            type="button"
+            onClick={() => setUploadMethod('file')}
+            className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all ${
+              uploadMethod === 'file'
+                ? 'bg-blue-600 text-white shadow-md'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            📁 Upload File
+          </button>
+          <button
+            type="button"
+            onClick={() => setUploadMethod('url')}
+            className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all ${
+              uploadMethod === 'url'
+                ? 'bg-purple-600 text-white shadow-md'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            🔗 Paste URL
+          </button>
+        </div>
       </div>
+
+      {/* File Upload */}
+      {uploadMethod === 'file' && (
+        <div className="mb-4">
+          <label htmlFor="photo" className="block text-sm font-medium text-gray-700 mb-2">
+            Photo File
+          </label>
+          <input
+            type="file"
+            id="photo"
+            name="photo"
+            accept="image/*"
+            required
+            onChange={handleFileChange}
+            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          />
+          {selectedFile && (
+            <div className="mt-2 text-xs text-gray-600 bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <p className="font-medium mb-1">📁 {selectedFile.name}</p>
+              <p>Size: {formatFileSize(selectedFile.size)}</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* URL Input */}
+      {uploadMethod === 'url' && (
+        <div className="mb-4">
+          <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 mb-2">
+            Image URL
+          </label>
+          <input
+            type="url"
+            id="imageUrl"
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+            placeholder="https://example.com/image.jpg"
+            required
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+          />
+          <p className="mt-1 text-xs text-gray-500">
+            Paste a direct link to an image (jpg, png, webp, etc.)
+          </p>
+          {imageUrl && (
+            <div className="mt-3 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+              <p className="text-xs font-medium text-purple-900 mb-2">Preview:</p>
+              <img 
+                src={imageUrl} 
+                alt="Preview" 
+                className="w-full h-48 object-contain bg-gray-100 rounded"
+                onError={(e) => {
+                  e.currentTarget.src = ''
+                  e.currentTarget.alt = 'Invalid image URL'
+                }}
+              />
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="mb-4">
         <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
