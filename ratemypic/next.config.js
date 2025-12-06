@@ -6,7 +6,16 @@ const nextConfig = {
         protocol: 'https',
         hostname: '**.supabase.co',
       },
+      {
+        protocol: 'https',
+        hostname: 'ik.imagekit.io',
+      },
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
     ],
+    unoptimized: false,
   },
 }
 
