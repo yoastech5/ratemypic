@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "imagekit": "^6.0.0",
+    "imagekitio-react": "^4.3.0"
+  }
+}

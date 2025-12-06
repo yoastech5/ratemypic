@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { imagekit } from '@/lib/imagekit'
 import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
@@ -31,29 +32,32 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    // Upload to Supabase Storage
+    // Convert File to Buffer for ImageKit
+    const bytes = await photo.arrayBuffer()
+    const buffer = Buffer.from(bytes)
+
+    // Upload to ImageKit
     const fileExt = photo.name.split('.').pop()
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
     
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('photos')
-      .upload(fileName, photo)
+    const uploadResult = await imagekit.upload({
+      file: buffer,
+      fileName: fileName,
+      folder: '/ratemypic-photos',
+      useUniqueFileName: true,
+      tags: ['ratemypic', category || 'uncategorized'],
+    })
 
-    if (uploadError) {
-      console.error('Upload error:', uploadError)
+    if (!uploadResult || !uploadResult.url) {
+      console.error('ImageKit upload failed')
       return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 })
     }
 
-    // Get public URL
-    const { data: { publicUrl } } = supabase.storage
-      .from('photos')
-      .getPublicUrl(fileName)
-
-    // Insert photo record
+    // Insert photo record with ImageKit URL
     const { error: insertError } = await supabase
       .from('photos')
       .insert({
-        photo_url: publicUrl,
+        photo_url: uploadResult.url,
         title,
         description: description || null,
         category: category || null,
@@ -65,7 +69,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Failed to create photo record' }, { status: 500 })
     }
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ 
+      success: true,
+      imageUrl: uploadResult.url,
+      fileId: uploadResult.fileId 
+    })
   } catch (error) {
     console.error('Upload error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
