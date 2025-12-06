@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { imagekit } from '@/lib/imagekit'
+import { imagekit, isImageKitConfigured } from '@/lib/imagekit'
 import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
@@ -32,32 +32,58 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    // Convert File to Buffer for ImageKit
-    const bytes = await photo.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-
-    // Upload to ImageKit
     const fileExt = photo.name.split('.').pop()
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
-    
-    const uploadResult = await imagekit.upload({
-      file: buffer,
-      fileName: fileName,
-      folder: '/ratemypic-photos',
-      useUniqueFileName: true,
-      tags: ['ratemypic', category || 'uncategorized'],
-    })
+    let photoUrl = ''
 
-    if (!uploadResult || !uploadResult.url) {
-      console.error('ImageKit upload failed')
-      return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 })
+    // Try ImageKit first, fall back to Supabase if not configured
+    if (isImageKitConfigured()) {
+      try {
+        // Convert File to Buffer for ImageKit
+        const bytes = await photo.arrayBuffer()
+        const buffer = Buffer.from(bytes)
+
+        // Upload to ImageKit
+        const uploadResult = await imagekit.upload({
+          file: buffer,
+          fileName: fileName,
+          folder: '/ratemypic-photos',
+          useUniqueFileName: true,
+          tags: ['ratemypic', category || 'uncategorized'],
+        })
+
+        if (uploadResult && uploadResult.url) {
+          photoUrl = uploadResult.url
+        }
+      } catch (error) {
+        console.error('ImageKit upload failed, falling back to Supabase:', error)
+      }
     }
 
-    // Insert photo record with ImageKit URL
+    // Fall back to Supabase if ImageKit failed or not configured
+    if (!photoUrl) {
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('photos')
+        .upload(fileName, photo)
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError)
+        return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 })
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('photos')
+        .getPublicUrl(fileName)
+
+      photoUrl = publicUrl
+    }
+
+    // Insert photo record
     const { error: insertError } = await supabase
       .from('photos')
       .insert({
-        photo_url: uploadResult.url,
+        photo_url: photoUrl,
         title,
         description: description || null,
         category: category || null,
@@ -71,8 +97,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ 
       success: true,
-      imageUrl: uploadResult.url,
-      fileId: uploadResult.fileId 
+      imageUrl: photoUrl,
+      storage: photoUrl.includes('imagekit.io') ? 'imagekit' : 'supabase'
     })
   } catch (error) {
     console.error('Upload error:', error)

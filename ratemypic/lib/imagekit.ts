@@ -2,10 +2,20 @@ import ImageKit from 'imagekit'
 
 // Server-side ImageKit instance
 export const imagekit = new ImageKit({
-  publicKey: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY || '',
-  privateKey: process.env.IMAGEKIT_PRIVATE_KEY || '',
-  urlEndpoint: process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT || '',
+  publicKey: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY || 'dummy',
+  privateKey: process.env.IMAGEKIT_PRIVATE_KEY || 'dummy',
+  urlEndpoint: process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT || 'https://ik.imagekit.io/dummy',
 })
+
+// Check if ImageKit is properly configured
+export const isImageKitConfigured = () => {
+  return !!(
+    process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY &&
+    process.env.IMAGEKIT_PRIVATE_KEY &&
+    process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT &&
+    process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY !== 'dummy'
+  )
+}
 
 // Client-side ImageKit URL builder
 export const getImageKitUrl = (

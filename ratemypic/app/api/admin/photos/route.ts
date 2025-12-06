@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { imagekit } from '@/lib/imagekit'
+import { imagekit, isImageKitConfigured } from '@/lib/imagekit'
 import { NextResponse } from 'next/server'
 
 // Update photo status (hide/unhide)
@@ -73,25 +73,37 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'Missing photo_id' }, { status: 400 })
     }
 
-    // Get photo to delete from ImageKit
+    // Get photo to delete from storage
     const { data: photo } = await supabase
       .from('photos')
       .select('photo_url')
       .eq('id', photo_id)
       .single()
 
-    if (photo && photo.photo_url.includes('imagekit.io')) {
-      try {
-        // Extract fileId from ImageKit URL
-        const urlParts = photo.photo_url.split('/')
-        const fileIdWithExt = urlParts[urlParts.length - 1]
-        const fileId = fileIdWithExt.split('?')[0] // Remove query params if any
-        
-        // Delete from ImageKit
-        await imagekit.deleteFile(fileId)
-      } catch (error) {
-        console.error('ImageKit deletion error:', error)
-        // Continue with database deletion even if ImageKit deletion fails
+    if (photo) {
+      // Delete from ImageKit if configured and URL is from ImageKit
+      if (isImageKitConfigured() && photo.photo_url.includes('imagekit.io')) {
+        try {
+          // Extract fileId from ImageKit URL
+          const urlParts = photo.photo_url.split('/')
+          const fileIdWithExt = urlParts[urlParts.length - 1]
+          const fileId = fileIdWithExt.split('?')[0] // Remove query params if any
+          
+          // Delete from ImageKit
+          await imagekit.deleteFile(fileId)
+        } catch (error) {
+          console.error('ImageKit deletion error:', error)
+          // Continue with database deletion even if ImageKit deletion fails
+        }
+      } else {
+        // Delete from Supabase Storage
+        try {
+          const urlParts = photo.photo_url.split('/')
+          const fileName = urlParts[urlParts.length - 1]
+          await supabase.storage.from('photos').remove([fileName])
+        } catch (error) {
+          console.error('Supabase storage deletion error:', error)
+        }
       }
     }
 
